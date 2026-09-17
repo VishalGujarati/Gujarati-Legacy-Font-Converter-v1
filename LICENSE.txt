@@ -1,0 +1,31 @@
+GUJARATI LEGACY FONT CONVERTER
+SOFTWARE LICENSE AGREEMENT
+
+Copyright © 2026 Vishal / Passion Projects. All rights reserved.
+
+1. GRANT OF LICENSE
+This software is provided to the end user as a proprietary application for converting supported Gujarati legacy-font documents to Unicode Gujarati. Subject to this agreement, you may install and use the software on computers that you control.
+
+2. RESTRICTIONS
+You may not sell, sublicense, rent, lease, modify, repackage, reverse engineer, decompile, disassemble, or redistribute the software or substantial parts of its implementation, except where a restriction is prohibited by applicable law.
+
+3. OFFICIAL COPIES
+Only obtain installers from the official project distribution channel. If you need to provide the software to another person or organization, provide them with the official release rather than a modified or repackaged copy.
+
+4. CONVERSION RESULTS
+You remain responsible for reviewing converted documents before relying on them. Legacy-font conversion can depend on the source document, font metadata, and formatting.
+
+5. PRIVACY
+Core conversion is performed locally. The application does not need an online conversion service to convert documents. Optional features, if enabled or explicitly used, are governed by the information shown to you at the time of use.
+
+6. NO WARRANTY
+The software is provided "as is" without warranty of any kind, to the maximum extent permitted by applicable law.
+
+7. OWNERSHIP
+All rights in the application, original source code, conversion rules, mappings, user interface, documentation, and original artwork remain with the copyright holder, subject to the rights of third-party components and fonts.
+
+8. THIRD-PARTY RIGHTS
+Third-party libraries, fonts, and other components remain subject to their respective licenses. See THIRD-PARTY-NOTICES.txt.
+
+9. ACCEPTANCE
+By selecting "I accept the agreement" during installation, you acknowledge that you have read and agree to this license.

@@ -1,0 +1,5 @@
+THIRD-PARTY NOTICES
+
+Gujarati Legacy Font Converter uses Python standard-library modules and bundled font files. Each bundled font may have licensing terms that are separate from this software license. Verify and retain the original font license information before redistributing the application or fonts.
+
+The application itself does not grant ownership of any third-party font.

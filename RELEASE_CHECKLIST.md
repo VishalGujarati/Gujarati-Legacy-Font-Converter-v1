@@ -1,0 +1,23 @@
+# Windows release checklist
+
+- [ ] Conversion regression tests pass
+- [ ] Arun structural tests pass
+- [ ] Extensionless TXT/DOCX/ODT tests pass
+- [ ] Hari folder conversion tested
+- [ ] Arun folder conversion tested
+- [ ] Windows 7 SP1 x64 tested
+- [ ] Windows 10 x64 tested
+- [ ] Windows 11 x64 tested
+- [ ] EXE version is 1.0.1
+- [ ] Application icon is correct
+- [ ] License page appears during installation
+- [ ] Desktop shortcut is optional and unchecked by default
+- [ ] Start Menu shortcut is created
+- [ ] Uninstaller works
+- [ ] Original input files are preserved
+- [ ] No automatic telemetry occurs unless the user opts in
+- [ ] No automatic remote control check occurs at startup
+- [ ] Defender/SmartScreen behavior has been checked on a clean machine
+- [ ] SHA-256 hash recorded
+- [ ] Exact installer archived
+- [ ] Source commit/tag archived
