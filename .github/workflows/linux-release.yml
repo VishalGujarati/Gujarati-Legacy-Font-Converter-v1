@@ -41,6 +41,9 @@ jobs:
 
               python3.8 -m pip install "pyinstaller==5.13.2"
 
+              echo "=== Checking Python stdlib ==="
+              python3.8 -c "import ipaddress; print('ipaddress:', ipaddress.__file__)"
+
               python3.8 -m PyInstaller \
                 --clean \
                 --noconfirm \
