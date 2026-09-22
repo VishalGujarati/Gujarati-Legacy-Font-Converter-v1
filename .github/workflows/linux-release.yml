@@ -9,15 +9,17 @@ on:
 jobs:
   build-linux:
     runs-on: ubuntu-22.04
+
     steps:
       - uses: actions/checkout@v4
 
-      # Build inside Ubuntu 20.04 so the resulting binary has a better
-      # chance of running on Ubuntu 20.04 and newer systems.
+      # Build inside Ubuntu 20.04 so the resulting application
+      # has a better chance of running on Ubuntu 20.04 and newer.
       - name: Build application in Ubuntu 20.04
         shell: bash
         run: |
           set -euo pipefail
+
           docker run --rm \
             -v "$PWD:/src" \
             -w /src \
@@ -25,23 +27,40 @@ jobs:
             bash -lc '
               set -e
               export DEBIAN_FRONTEND=noninteractive
+
               apt-get update
-              apt-get install -y python3.8 python3.8-venv python3-pip
-              python3.8 -m pip install --upgrade "pip<24.1" "setuptools<70" wheel
+              apt-get install -y \
+                python3.8 \
+                python3.8-venv \
+                python3-pip
+
+              python3.8 -m pip install --upgrade \
+                "pip<24.1" \
+                "setuptools<70" \
+                wheel
+
               python3.8 -m pip install "pyinstaller==5.13.2"
-              python3.8 -m PyInstaller --clean --noconfirm build/GujaratiLegacyFontConverter.spec
+
+              python3.8 -m PyInstaller \
+                --clean \
+                --noconfirm \
+                build/GujaratiLegacyFontConverter.spec
+
               chown -R "$(stat -c "%u:%g" /src)" /src/dist
             '
 
+      # Create the Debian package.
       - name: Package DEB
         shell: bash
         run: |
           set -euo pipefail
+
           VERSION="$(tr -d '[:space:]' < VERSION)"
           PKG="gujarati-legacy-font-converter"
           ROOT="deb-root"
 
           rm -rf "$ROOT"
+
           mkdir -p \
             "$ROOT/DEBIAN" \
             "$ROOT/opt/$PKG" \
@@ -49,27 +68,42 @@ jobs:
             "$ROOT/usr/share/applications" \
             "$ROOT/usr/share/icons/hicolor/256x256/apps"
 
-          cp -a dist/GujaratiLegacyFontConverter/. "$ROOT/opt/$PKG/"
-          cp assets/software_logo.png "$ROOT/usr/share/icons/hicolor/256x256/apps/$PKG.png"
+          # Application files
+          cp -a dist/GujaratiLegacyFontConverter/. \
+            "$ROOT/opt/$PKG/"
 
+          # Application icon
+          cp assets/software_logo.png \
+            "$ROOT/usr/share/icons/hicolor/256x256/apps/$PKG.png"
+
+          # Command-line/application launcher
           cat > "$ROOT/usr/bin/$PKG" <<'LAUNCHER'
           #!/bin/sh
-          cd /opt/gujarati-legacy-font-converter
-          exec ./GujaratiLegacyFontConverter "$@"
+          set -e
+
+          APP_DIR="/opt/gujarati-legacy-font-converter"
+          APP="$APP_DIR/GujaratiLegacyFontConverter"
+
+          exec "$APP" "$@"
           LAUNCHER
+
           chmod 0755 "$ROOT/usr/bin/$PKG"
 
+          # Desktop application entry
           cat > "$ROOT/usr/share/applications/$PKG.desktop" <<DESKTOP
           [Desktop Entry]
+          Version=1.0
+          Type=Application
           Name=Gujarati Legacy Font Converter
           Comment=Convert Gujarati legacy-font documents to Unicode
           Exec=/usr/bin/$PKG
           Icon=$PKG
           Terminal=false
-          Type=Application
           Categories=Utility;Office;
+          StartupNotify=true
           DESKTOP
 
+          # Debian package metadata
           cat > "$ROOT/DEBIAN/control" <<CONTROL
           Package: $PKG
           Version: $VERSION
@@ -81,28 +115,126 @@ jobs:
            Offline Gujarati legacy-font to Unicode converter for supported Gujarati fonts and documents.
           CONTROL
 
-          cat > "$ROOT/DEBIAN/postinst" <<'POSTINST'
-          #!/bin/sh
-          set -e
-          if command -v update-desktop-database >/dev/null 2>&1; then
-            update-desktop-database /usr/share/applications >/dev/null 2>&1 || true
-          fi
-          exit 0
-          POSTINST
-          chmod 0755 "$ROOT/DEBIAN/postinst"
-
           mkdir -p Output
-          dpkg-deb --build --root-owner-group "$ROOT" "Output/GujaratiLegacyFontConverter-${VERSION}-amd64.deb"
 
+          dpkg-deb \
+            --build \
+            --root-owner-group \
+            "$ROOT" \
+            "Output/GujaratiLegacyFontConverter-${VERSION}-amd64.deb"
+
+      # Basic Debian package validation.
+      - name: Validate DEB package
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="$(tr -d '[:space:]' < VERSION)"
+          DEB="Output/GujaratiLegacyFontConverter-${VERSION}-amd64.deb"
+
+          echo "Checking package:"
+          dpkg-deb --info "$DEB"
+
+          echo
+          echo "Checking package contents:"
+          dpkg-deb --contents "$DEB"
+
+          echo
+          echo "Checking package structure:"
+          dpkg-deb --field "$DEB" Package
+          dpkg-deb --field "$DEB" Version
+          dpkg-deb --field "$DEB" Architecture
+
+      # Install and test the package inside clean Ubuntu 20.04.
+      - name: Test DEB installation in Ubuntu 20.04
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="$(tr -d '[:space:]' < VERSION)"
+          DEB_NAME="GujaratiLegacyFontConverter-${VERSION}-amd64.deb"
+
+          docker run --rm \
+            -v "$PWD/Output:/packages:ro" \
+            ubuntu:20.04 \
+            bash -lc "
+              set -e
+              export DEBIAN_FRONTEND=noninteractive
+
+              echo '=== Installing test dependencies ==='
+              apt-get update
+              apt-get install -y \
+                xvfb \
+                desktop-file-utils
+
+              echo '=== Installing DEB ==='
+              dpkg -i /packages/$DEB_NAME
+
+              echo '=== Checking installed package ==='
+              dpkg -s gujarati-legacy-font-converter
+
+              echo '=== Checking launcher ==='
+              test -x /usr/bin/gujarati-legacy-font-converter
+
+              echo '=== Checking application ==='
+              test -x /opt/gujarati-legacy-font-converter/GujaratiLegacyFontConverter
+
+              echo '=== Checking desktop entry ==='
+              test -f /usr/share/applications/gujarati-legacy-font-converter.desktop
+
+              desktop-file-validate \
+                /usr/share/applications/gujarati-legacy-font-converter.desktop
+
+              echo '=== Starting GUI test ==='
+
+              set +e
+
+              timeout 10s \
+                xvfb-run -a \
+                /usr/bin/gujarati-legacy-font-converter
+
+              EXIT_CODE=\$?
+
+              set -e
+
+              # 124 means timeout reached, which is expected
+              # if the GUI successfully remained open.
+              if [ "\$EXIT_CODE" -ne 0 ] && [ "\$EXIT_CODE" -ne 124 ]; then
+                echo 'GUI application failed to start.'
+                exit "\$EXIT_CODE"
+              fi
+
+              echo 'GUI startup test passed.'
+
+              echo '=== Uninstalling package ==='
+              apt-get remove -y gujarati-legacy-font-converter
+
+              echo '=== Checking uninstall ==='
+              if [ -e /usr/bin/gujarati-legacy-font-converter ]; then
+                echo 'Launcher still exists after uninstall.'
+                exit 1
+              fi
+
+              echo 'DEB installation test PASSED.'
+            "
+
+      # Generate checksum.
       - name: Generate SHA-256
         shell: bash
         run: |
           set -euo pipefail
+
           VERSION="$(tr -d '[:space:]' < VERSION)"
+
           cd Output
-          sha256sum "GujaratiLegacyFontConverter-${VERSION}-amd64.deb" > SHA256SUMS-Linux.txt
+
+          sha256sum \
+            "GujaratiLegacyFontConverter-${VERSION}-amd64.deb" \
+            > SHA256SUMS-Linux.txt
+
           cat SHA256SUMS-Linux.txt
 
+      # Upload only after all tests have passed.
       - name: Upload release package
         uses: actions/upload-artifact@v4
         with:
