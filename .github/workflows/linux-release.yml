@@ -44,6 +44,7 @@ jobs:
               python3.8 -m PyInstaller \
                 --clean \
                 --noconfirm \
+                --hidden-import=ipaddress \
                 build/GujaratiLegacyFontConverter.spec
 
               chown -R "$(stat -c "%u:%g" /src)" /src/dist
@@ -76,7 +77,7 @@ jobs:
           cp assets/software_logo.png \
             "$ROOT/usr/share/icons/hicolor/256x256/apps/$PKG.png"
 
-          # Command-line/application launcher
+          # Application launcher
           cat > "$ROOT/usr/bin/$PKG" <<'LAUNCHER'
           #!/bin/sh
           set -e
@@ -99,7 +100,7 @@ jobs:
           Exec=/usr/bin/$PKG
           Icon=$PKG
           Terminal=false
-          Categories=Utility;Office;
+          Categories=Office;
           StartupNotify=true
           DESKTOP
 
@@ -218,7 +219,7 @@ jobs:
               echo 'DEB installation test PASSED.'
             "
 
-      # Generate checksum.
+      # Generate SHA-256.
       - name: Generate SHA-256
         shell: bash
         run: |
