@@ -44,7 +44,6 @@ jobs:
               python3.8 -m PyInstaller \
                 --clean \
                 --noconfirm \
-                --hidden-import=ipaddress \
                 build/GujaratiLegacyFontConverter.spec
 
               chown -R "$(stat -c "%u:%g" /src)" /src/dist
