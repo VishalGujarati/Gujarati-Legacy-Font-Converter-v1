@@ -29,6 +29,7 @@ jobs:
               export DEBIAN_FRONTEND=noninteractive
 
               apt-get update
+
               apt-get install -y \
                 python3.8 \
                 python3.8-venv \
@@ -42,7 +43,10 @@ jobs:
               python3.8 -m pip install "pyinstaller==5.13.2"
 
               echo "=== Checking Python stdlib ==="
-              python3.8 -c "import ipaddress; print('ipaddress:', ipaddress.__file__)"
+
+              python3.8 -c "import ipaddress; print(\"ipaddress:\", ipaddress.__file__)"
+
+              echo "=== Building with PyInstaller ==="
 
               python3.8 -m PyInstaller \
                 --clean \
@@ -165,24 +169,31 @@ jobs:
               export DEBIAN_FRONTEND=noninteractive
 
               echo '=== Installing test dependencies ==='
+
               apt-get update
+
               apt-get install -y \
                 xvfb \
                 desktop-file-utils
 
               echo '=== Installing DEB ==='
+
               dpkg -i /packages/$DEB_NAME
 
               echo '=== Checking installed package ==='
+
               dpkg -s gujarati-legacy-font-converter
 
               echo '=== Checking launcher ==='
+
               test -x /usr/bin/gujarati-legacy-font-converter
 
               echo '=== Checking application ==='
+
               test -x /opt/gujarati-legacy-font-converter/GujaratiLegacyFontConverter
 
               echo '=== Checking desktop entry ==='
+
               test -f /usr/share/applications/gujarati-legacy-font-converter.desktop
 
               desktop-file-validate \
@@ -210,9 +221,11 @@ jobs:
               echo 'GUI startup test passed.'
 
               echo '=== Uninstalling package ==='
+
               apt-get remove -y gujarati-legacy-font-converter
 
               echo '=== Checking uninstall ==='
+
               if [ -e /usr/bin/gujarati-legacy-font-converter ]; then
                 echo 'Launcher still exists after uninstall.'
                 exit 1
