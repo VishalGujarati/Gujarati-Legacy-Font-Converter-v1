@@ -65,7 +65,7 @@ GITHUB_RELEASES_URL = GITHUB_URL
 SUPPORT_URL = "https://u.payu.in/srWL9ANC66kC"
 WEBSITE_URL = "https://passionprojects.in/"
 PROJECT_YEAR = "2026"
-CONVERSION_WARNING = "⚠️ Converted text may contain errors. Please verify before final use."
+CONVERSION_WARNING = "Warning: Converted text may contain errors. Please verify before final use."
 FEEDBACK_URL = GITHUB_URL
 LOGO_PATH = PROJECT_ROOT / "assets" / "software_logo.png"
 
@@ -371,7 +371,7 @@ class HariUnicodeConverterApp(tk.Tk):
         frame.pack(fill="both", expand=True, padx=20, pady=20)
 
         tk.Label(
-            frame, text="✓  No update available" if success else "Update check",
+            frame, text="No update available" if success else "Update check",
             bg=CARD, fg=TEAL if success else TEXT,
             font=("Segoe UI", 14, "bold"),
         ).pack(anchor="w", padx=22, pady=(20, 8))
@@ -970,12 +970,12 @@ class HariUnicodeConverterApp(tk.Tk):
         ).pack(anchor="w", pady=(2, 0))
         ttk.Label(
             title_text,
-            text="Free • Local • Privacy-focused  •  Made for Gujarati users",
+            text="Free - Local - Privacy-focused  - Made for Gujarati users",
             style="Identity.TLabel",
         ).pack(anchor="w", pady=(5, 0))
         ttk.Label(
             left,
-            text="🔒 Your documents stay on your computer. Text and files are never uploaded.",
+            text="Your documents stay on your computer. Text and files are never uploaded.",
             style="Privacy.TLabel",
         ).pack(anchor="w", pady=(7, 0))
 
@@ -983,7 +983,7 @@ class HariUnicodeConverterApp(tk.Tk):
         right.pack(side="right", anchor="n")
         self.update_button = ttk.Button(
             right,
-            text="↻ Check for Updates",
+            text="Check for Updates",
             style="Secondary.TButton",
             command=self._check_for_updates_manual,
         )
@@ -1002,7 +1002,7 @@ class HariUnicodeConverterApp(tk.Tk):
         ).pack(side="left", padx=(0, 7))
         ttk.Button(
             right,
-            text="☕ Support",
+            text="Support",
             style="Accent.TButton",
             command=lambda: self._open_url(SUPPORT_URL),
         ).pack(side="left")
@@ -1031,7 +1031,7 @@ class HariUnicodeConverterApp(tk.Tk):
         ttk.Label(footer, textvariable=self.status_var, style="Muted.TLabel").pack(side="left")
         ttk.Label(
             footer,
-            text="🔒 Local conversion • Your document text and files stay on your computer and are never uploaded.",
+            text="Local conversion - Your document text and files stay on your computer and are never uploaded.",
             style="Muted.TLabel",
         ).pack(side="right")
 
@@ -1071,7 +1071,7 @@ class HariUnicodeConverterApp(tk.Tk):
 
         ttk.Label(
             parent,
-            text=f"Developed by Passion Projects • {PROJECT_YEAR}",
+            text=f"Developed by Passion Projects - {PROJECT_YEAR}",
             style="BrandFooter.TLabel",
             anchor="center",
         ).pack(fill="x", pady=(5, 0))
