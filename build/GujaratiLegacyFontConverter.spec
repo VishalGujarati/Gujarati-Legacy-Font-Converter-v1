@@ -13,10 +13,10 @@ if sys.platform.startswith("win"):
         "version": str(ROOT / "build" / "version_info.txt"),
     })
 
-hiddenimports =  (
+hiddenimports = (
     collect_submodules("converter")
     + collect_submodules("backend")
-    + ["ipaddress"]
+    + ["ipaddress", "urllib.parse", "pathlib"]
 )
 datas = [
     (str(ROOT / "assets"), "assets"),
