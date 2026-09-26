@@ -161,6 +161,18 @@ class HariUnicodeConverterApp(tk.Tk):
         self._app_logo = self._load_app_logo()
 
         self.title(APP_TITLE)
+
+        # Identify the running application correctly in Ubuntu/Linux docks.
+        # This prevents the generic Tk icon from being used for the window.
+        if sys.platform.startswith("linux"):
+            try:
+                self.wm_class(
+                    "GujaratiLegacyFontConverter",
+                    "GujaratiLegacyFontConverter",
+                )
+            except tk.TclError:
+                pass
+
         if self._app_logo is not None:
             try:
                 self.iconphoto(True, self._app_logo)
