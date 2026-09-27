@@ -1,0 +1,67 @@
+GUJARATI LEGACY FONT CONVERTER
+Version 1.0.1
+Ubuntu Installation Guide
+
+QUICK INSTALL - RECOMMENDED
+
+1. Extract the ZIP file first.
+2. Double-click:
+   GujaratiLegacyFontConverter-1.0.1-amd64.deb
+3. Ubuntu App Center / Software installer should open.
+4. Click Install.
+5. Enter your Ubuntu password when asked.
+6. After installation, open Gujarati Legacy Font Converter from the Applications menu.
+
+If double-clicking the .deb file does not open the installer, use Method 2 below.
+
+METHOD 2 - INSTALL USING TERMINAL
+
+If the .deb file is in your Downloads folder:
+
+1. Open Terminal.
+2. Run:
+
+   cd ~/Downloads
+
+3. Then run:
+
+   sudo apt install ./GujaratiLegacyFontConverter-1.0.1-amd64.deb
+
+4. Enter your Ubuntu password when asked.
+5. If Ubuntu asks for confirmation, type Y and press Enter.
+6. After installation, open Gujarati Legacy Font Converter from the Applications menu.
+
+IF THE .DEB FILE IS IN ANOTHER FOLDER
+
+Change to the folder where you extracted the ZIP.
+For example, if it is on your Desktop:
+
+   cd ~/Desktop
+
+Then run:
+
+   sudo apt install ./GujaratiLegacyFontConverter-1.0.1-amd64.deb
+
+IMPORTANT
+
+- Extract the ZIP file before installing the .deb file.
+- This package is for 64-bit Ubuntu.
+- The package is built against Ubuntu 20.04 as the baseline. Compatibility with newer Ubuntu versions depends on the Ubuntu version and desktop environment.
+
+NEED HELP?
+
+If you have a problem with installation or using the software, contact:
+
+support.passionprojects@gmail.com
+
+When contacting us, please mention:
+- Your Ubuntu version
+- Your desktop environment, if known
+- What you were trying to do
+- What problem you encountered
+- Any error message you received
+
+Website:
+https://passionprojects.in/
+
+Passion Projects - 2026

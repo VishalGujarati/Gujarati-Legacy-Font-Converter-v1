@@ -32,6 +32,11 @@ jobs:
         shell: cmd
         run: |
           "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" build\installer.iss
+      - name: Prepare installation guide
+        shell: powershell
+        run: |
+          Copy-Item "HOW_TO_INSTALL_WINDOWS.txt" "Output\HOW_TO_INSTALL.txt"
+
       - name: Generate SHA-256
         shell: powershell
         run: |
@@ -44,4 +49,5 @@ jobs:
           name: GujaratiLegacyFontConverter-1.0.1-Windows-x64
           path: |
             Output/GujaratiLegacyFontConverter-1.0.1-Setup-x64.exe
+            Output/HOW_TO_INSTALL.txt
             Output/SHA256SUMS.txt

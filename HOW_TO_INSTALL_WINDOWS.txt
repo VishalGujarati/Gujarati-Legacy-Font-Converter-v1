@@ -1,0 +1,37 @@
+GUJARATI LEGACY FONT CONVERTER
+Version 1.0.1
+Windows Installation Guide
+
+QUICK INSTALL
+
+1. Extract the ZIP file first.
+2. Double-click:
+   GujaratiLegacyFontConverter-1.0.1-Setup-x64.exe
+3. Follow:
+   Next -> Next -> Install -> Finish
+4. Open Gujarati Legacy Font Converter from the Start Menu or desktop shortcut.
+
+IMPORTANT
+
+Do not try to run the installer from inside the ZIP file.
+Extract the ZIP first, then run the installer.
+
+If Windows shows a security warning, make sure the file was downloaded
+from the official Passion Projects website or the official GitHub release.
+
+NEED HELP?
+
+If you have a problem with installation or using the software, contact:
+
+support.passionprojects@gmail.com
+
+When contacting us, please mention:
+- Your Windows version
+- What you were trying to do
+- What problem you encountered
+- Any error message you received
+
+Website:
+https://passionprojects.in/
+
+Passion Projects - 2026

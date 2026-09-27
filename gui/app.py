@@ -62,12 +62,14 @@ OWNER_NAME = "@vishalgujarati"
 AUTHOR = f"Developed by {COMPANY_NAME}"
 GITHUB_URL = "https://github.com/VishalGujarati"
 GITHUB_RELEASES_URL = GITHUB_URL
-SUPPORT_URL = "https://u.payu.in/srWL9ANC66kC"
+SUPPORT_URL = "https://razorpay.me/@passionprojects"
+SUPPORT_EMAIL = "support.passionprojects@gmail.com"
 WEBSITE_URL = "https://passionprojects.in/"
 PROJECT_YEAR = "2026"
-CONVERSION_WARNING = "⚠️ Converted text may contain errors. Please verify before final use."
+CONVERSION_WARNING = "Warning: Converted text may contain errors. Please verify before final use."
 FEEDBACK_URL = GITHUB_URL
 LOGO_PATH = PROJECT_ROOT / "assets" / "software_logo.png"
+SUPPORT_QR_PATH = PROJECT_ROOT / "assets" / "razorpay_support_qr.png"
 
 # Modern, but deliberately simple colors so Tkinter remains lightweight.
 BG = "#F5F7FB"
@@ -107,6 +109,7 @@ DEFAULT_SETTINGS = {
     "remember_folder": True,
     "confirm_overwrite": True,
     "last_folder": "",
+    "last_file_folder": "",
     "telemetry_enabled": False,
     "privacy_notice_seen": False,
 }
@@ -141,7 +144,13 @@ def save_settings(settings):
 class HariUnicodeConverterApp(tk.Tk):
 
     def __init__(self):
-        super().__init__()
+        # Give Linux desktop environments a stable application class so the
+        # packaged icon is associated with the running window instead of Tk.
+        # Keep the Windows initialization unchanged.
+        if sys.platform.startswith("linux"):
+            super().__init__(className="GujaratiLegacyFontConverter")
+        else:
+            super().__init__()
 
         self.settings = load_settings()
         self.font_size = int(self.settings.get("font_size", 13))
@@ -161,6 +170,7 @@ class HariUnicodeConverterApp(tk.Tk):
         self._app_logo = self._load_app_logo()
 
         self.title(APP_TITLE)
+
         if self._app_logo is not None:
             try:
                 self.iconphoto(True, self._app_logo)
@@ -316,7 +326,7 @@ class HariUnicodeConverterApp(tk.Tk):
         """Check the Supabase software-control record without blocking the GUI."""
         button = getattr(self, "update_button", None)
         if button is not None:
-            button.configure(state="disabled", text="Checking…")
+            button.configure(state="disabled", text="Checking...")
         threading.Thread(
             target=self._manual_update_worker,
             daemon=True,
@@ -371,7 +381,7 @@ class HariUnicodeConverterApp(tk.Tk):
         frame.pack(fill="both", expand=True, padx=20, pady=20)
 
         tk.Label(
-            frame, text="✓  No update available" if success else "Update check",
+            frame, text="No update available" if success else "Update check",
             bg=CARD, fg=TEAL if success else TEXT,
             font=("Segoe UI", 14, "bold"),
         ).pack(anchor="w", padx=22, pady=(20, 8))
@@ -396,7 +406,7 @@ class HariUnicodeConverterApp(tk.Tk):
     def _reset_update_button(self):
         button = getattr(self, "update_button", None)
         if button is not None:
-            button.configure(state="normal", text="↻ Check for Updates")
+            button.configure(state="normal", text="Check for Updates")
 
     @staticmethod
     def _version_tuple(version):
@@ -970,12 +980,12 @@ class HariUnicodeConverterApp(tk.Tk):
         ).pack(anchor="w", pady=(2, 0))
         ttk.Label(
             title_text,
-            text="Free • Local • Privacy-focused  •  Made for Gujarati users",
+            text="Free - Local - Privacy-focused  - Made for Gujarati users",
             style="Identity.TLabel",
         ).pack(anchor="w", pady=(5, 0))
         ttk.Label(
             left,
-            text="🔒 Your documents stay on your computer. Text and files are never uploaded.",
+            text="Your documents stay on your computer. Text and files are never uploaded.",
             style="Privacy.TLabel",
         ).pack(anchor="w", pady=(7, 0))
 
@@ -983,7 +993,7 @@ class HariUnicodeConverterApp(tk.Tk):
         right.pack(side="right", anchor="n")
         self.update_button = ttk.Button(
             right,
-            text="↻ Check for Updates",
+            text="Check for Updates",
             style="Secondary.TButton",
             command=self._check_for_updates_manual,
         )
@@ -1002,9 +1012,9 @@ class HariUnicodeConverterApp(tk.Tk):
         ).pack(side="left", padx=(0, 7))
         ttk.Button(
             right,
-            text="☕ Support",
+            text="Support",
             style="Accent.TButton",
-            command=lambda: self._open_url(SUPPORT_URL),
+            command=self._show_support,
         ).pack(side="left")
 
         # Main notebook
@@ -1031,7 +1041,7 @@ class HariUnicodeConverterApp(tk.Tk):
         ttk.Label(footer, textvariable=self.status_var, style="Muted.TLabel").pack(side="left")
         ttk.Label(
             footer,
-            text="🔒 Local conversion • Your document text and files stay on your computer and are never uploaded.",
+            text="Local conversion - Your document text and files stay on your computer and are never uploaded.",
             style="Muted.TLabel",
         ).pack(side="right")
 
@@ -1071,7 +1081,7 @@ class HariUnicodeConverterApp(tk.Tk):
 
         ttk.Label(
             parent,
-            text=f"Developed by Passion Projects • {PROJECT_YEAR}",
+            text=f"Developed by Passion Projects - {PROJECT_YEAR}",
             style="BrandFooter.TLabel",
             anchor="center",
         ).pack(fill="x", pady=(5, 0))
@@ -1702,7 +1712,7 @@ class HariUnicodeConverterApp(tk.Tk):
 
         # Give clear feedback and prevent repeated clicks for 3 seconds.
         self.copy_button.config(
-            text="✓ Unicode Copied",
+            text="Unicode Copied",
             state="disabled",
         )
         self.after(3000, self._reset_copy_button)
@@ -1726,14 +1736,21 @@ class HariUnicodeConverterApp(tk.Tk):
     # ========================================================
 
     def _browse_file(self):
-        path = filedialog.askopenfilename(
-            title="Select Legacy Gujarati File",
-            filetypes=[("All files", "*.*"), ("Supported files", "*.txt *.text *.docx *.odt"), ("Text files", "*.txt *.text"), ("Word documents", "*.docx"), ("OpenDocument", "*.odt")],
-            parent=self,
-        )
+        initialdir = self.settings.get("last_file_folder", "")
+        kwargs = {
+            "title": "Select Legacy Gujarati File",
+            "filetypes": [("All files", "*.*"), ("Supported files", "*.txt *.text *.docx *.odt"), ("Text files", "*.txt *.text"), ("Word documents", "*.docx"), ("OpenDocument", "*.odt")],
+            "parent": self,
+        }
+        if initialdir and Path(initialdir).is_dir():
+            kwargs["initialdir"] = initialdir
+        path = filedialog.askopenfilename(**kwargs)
         if not path:
             return
         self.file_input_var.set(path)
+        if self.settings.get("remember_folder", True):
+            self.settings["last_file_folder"] = str(Path(path).parent)
+            save_settings(self.settings)
         source = Path(path)
         
         try:
@@ -1803,15 +1820,49 @@ class HariUnicodeConverterApp(tk.Tk):
 
     def _open_file_output_folder(self):
         path = self.file_output_var.get().strip()
-        if path:
-            self._open_folder(Path(path).parent)
+        if not path:
+            return
+        output = Path(path)
+        folder = output.parent if output.suffix else output
+        if folder.exists() and folder.is_dir():
+            self._open_folder(folder)
+        else:
+            messagebox.showwarning(
+                "Folder Not Found",
+                "The output folder could not be found.",
+                parent=self,
+            )
+
+    def _open_converted_file(self):
+        path = self.file_output_var.get().strip()
+        if not path:
+            return
+        output = Path(path)
+        if not output.exists():
+            messagebox.showwarning("File Not Found", "The converted file could not be found.", parent=self)
+            return
+        try:
+            if sys.platform.startswith("win"):
+                os.startfile(str(output))
+            elif sys.platform == "darwin":
+                import subprocess
+                subprocess.Popen(["open", str(output)])
+            else:
+                import subprocess
+                subprocess.Popen(["xdg-open", str(output)])
+        except Exception as exc:
+            messagebox.showerror("Unable to Open File", f"Could not open the converted file.\n\n{exc}", parent=self)
 
     # ========================================================
     # FOLDER ACTIONS
     # ========================================================
 
     def _browse_folder(self):
-        path = filedialog.askdirectory(title="Select Folder Containing Legacy Gujarati Files", parent=self)
+        initialdir = self.settings.get("last_folder", "")
+        kwargs = {"title": "Select Folder Containing Legacy Gujarati Files", "parent": self}
+        if initialdir and Path(initialdir).is_dir():
+            kwargs["initialdir"] = initialdir
+        path = filedialog.askdirectory(**kwargs)
         if not path:
             return
         self.folder_input_var.set(path)
@@ -2158,6 +2209,117 @@ class HariUnicodeConverterApp(tk.Tk):
         self.status_var.set(f"Settings saved. Font size: {self.font_size}")
 
     # ========================================================
+    # SUPPORT
+    # ========================================================
+
+    def _show_support(self):
+        window = tk.Toplevel(self)
+        window.title("Support Passion Projects")
+        window.transient(self)
+        window.grab_set()
+        window.resizable(False, False)
+        window.configure(bg=BG)
+        if self._app_logo is not None:
+            try:
+                window.iconphoto(True, self._app_logo)
+            except tk.TclError:
+                pass
+
+        frame = tk.Frame(
+            window, bg=CARD, highlightbackground=BORDER, highlightthickness=1
+        )
+        frame.pack(fill="both", expand=True, padx=20, pady=20)
+
+        tk.Label(
+            frame,
+            text="Support Passion Projects",
+            bg=CARD,
+            fg=TEXT,
+            font=("Segoe UI", 18, "bold"),
+        ).pack(pady=(18, 6))
+
+        tk.Label(
+            frame,
+            text="If this free tool saves you time, you can support\nfuture Gujarati tools and projects.",
+            bg=CARD,
+            fg=MUTED,
+            font=("Segoe UI", 10),
+            justify="center",
+        ).pack(pady=(0, 10))
+
+        if SUPPORT_QR_PATH.exists():
+            try:
+                qr_image = tk.PhotoImage(file=str(SUPPORT_QR_PATH))
+                # Keep the support window compact while retaining a sharp QR.
+                if qr_image.width() > 200:
+                    scale = max(1, (qr_image.width() + 199) // 200)
+                    qr_image = qr_image.subsample(scale, scale)
+                self._support_qr_image = qr_image
+                tk.Label(
+                    frame,
+                    image=self._support_qr_image,
+                    bg=CARD,
+                    bd=0,
+                    highlightthickness=0,
+                ).pack(pady=(0, 4))
+                tk.Label(
+                    frame,
+                    text="Scan & Pay with any UPI app",
+                    bg=CARD,
+                    fg=TEXT,
+                    font=("Segoe UI", 10, "bold"),
+                ).pack(pady=(0, 10))
+            except tk.TclError:
+                self._support_qr_image = None
+
+        ttk.Button(
+            frame,
+            text="Open Support Website",
+            style="Accent.TButton",
+            command=lambda: self._open_url(WEBSITE_URL),
+        ).pack(pady=(0, 10))
+
+        tk.Label(
+            frame,
+            text="Need help? Contact us:",
+            bg=CARD,
+            fg=MUTED,
+            font=("Segoe UI", 9),
+        ).pack(pady=(0, 2))
+
+        tk.Label(
+            frame,
+            text=SUPPORT_EMAIL,
+            bg=CARD,
+            fg=TEXT,
+            font=("Segoe UI", 9, "bold"),
+        ).pack(pady=(0, 6))
+
+        ttk.Button(
+            frame,
+            text="Email Support",
+            command=lambda: self._open_url(
+                f"mailto:{SUPPORT_EMAIL}?subject=Gujarati%20Legacy%20Font%20Converter%20-%20Support"
+            ),
+        ).pack(pady=(0, 10))
+
+        tk.Label(
+            frame,
+            text="Payments are handled by Razorpay.",
+            bg=CARD,
+            fg=MUTED,
+            font=("Segoe UI", 8),
+        ).pack(pady=(0, 10))
+
+        ttk.Button(
+            frame,
+            text="Close",
+            command=window.destroy,
+        ).pack(pady=(0, 12))
+
+        self._center_window(window, 460, 590)
+
+    # ========================================================
     # ABOUT
     # ========================================================
 
@@ -2246,7 +2408,7 @@ class HariUnicodeConverterApp(tk.Tk):
 
         tk.Label(
             frame,
-            text=f"© {PROJECT_YEAR} Passion Projects",
+            text=f"(C) {PROJECT_YEAR} Passion Projects",
             bg=CARD,
             fg=MUTED,
             font=("Segoe UI", 8),
@@ -2262,7 +2424,7 @@ class HariUnicodeConverterApp(tk.Tk):
 
         tk.Label(
             frame,
-            text="Made for Gujarati users • Free and local",
+            text="Made for Gujarati users - Free and local",
             bg=CARD,
             fg=TEAL,
             font=("Segoe UI", 9, "bold"),
@@ -2275,15 +2437,15 @@ class HariUnicodeConverterApp(tk.Tk):
             fg=TEXT,
             font=("Segoe UI", 10),
             justify="center",
-        ).pack(pady=(0, 12))
+        ).pack(pady=(0, 10))
 
         buttons = ttk.Frame(frame)
         buttons.pack(pady=(0, 8))
         ttk.Button(
             buttons,
-            text="☕ Support Passion Projects",
+            text="Support Passion Projects",
             style="Accent.TButton",
-            command=lambda: self._open_url(SUPPORT_URL),
+            command=self._show_support,
         ).pack(side="left")
 
         privacy = tk.Frame(
@@ -2292,7 +2454,7 @@ class HariUnicodeConverterApp(tk.Tk):
         privacy.pack(fill="x", padx=18, pady=(10, 18))
         tk.Label(
             privacy,
-            text="🔒 Your documents stay on your computer",
+            text="Your documents stay on your computer",
             bg="#F0FDFA",
             fg=TEAL,
             font=("Segoe UI", 10, "bold"),
